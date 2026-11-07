@@ -1,2 +1,8 @@
-## cloudflare tunnelの導入
+# cloudflare tunnelの導入
+- 参考: https://text.yusukesakai.com/entry/20231022/1697901587
+
 - [nextcloud](https://github.com/cloudflare/cloudflared?tab=readme-ov-file)に従いインストール
+  - wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+  - sudo apt install ./cloudflared-linux-amd64.deb
+  - sudo cloudflared tunnel login
+  - sudo cloudflared tunnel create "任意のトンネル名"
