@@ -1,8 +1,76 @@
+# Nextcloudの導入
+- Docker上に構築する場合
+
+- 事前準備
+  - sudo apt install ca-certificates url gunpg
+  - sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+- Dockerのリポジトリの登録
+  - sudo mkdir -p /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+- Dockerの動作確認
+  - docker --version
+  - docker compose version
+
+- docker-compose.ymlファイルの作成
+  - 作成したディレクトリ上にdocker-compose.ymlファイルを作成
+```
+services:
+db:
+image: mariadb
+restart: always
+volumes:
+- db_data:/var/lib/mysql
+environment:
+- MYSQL_ROOT_PASSWORD=strong_root_pass
+- MYSQL_DATABASE=nextcloud
+- MYSQL_USER=nextcloud
+- MYSQL_PASSWORD=strong_db_pass
+
+app:
+image: nextcloud
+restart: always
+ports:
+- "8080:80"
+volumes:
+- nextcloud_data:/var/www/html
+environment:
+- MYSQL_HOST=db
+- MYSQL_DATABASE=nextcloud
+- MYSQL_USER=nextcloud
+- MYSQL_PASSWORD=strong_db_pass
+
+volumes:
+db_data:
+nextcloud_data:
+```
+
+- コンテナの起動
+  - docker compose up -d
+
+
 # cloudflare tunnelの導入
-- 参考: https://text.yusukesakai.com/entry/20231022/1697901587
 
 - [nextcloud](https://github.com/cloudflare/cloudflared?tab=readme-ov-file)に従いインストール
   - wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
   - sudo apt install ./cloudflared-linux-amd64.deb
   - sudo cloudflared tunnel login
   - sudo cloudflared tunnel create "任意のトンネル名"
+
+- config.ymlの作成
+```
+tunnel: "トンネル名"
+credentials-file: /home/"user name"/.cloudflared/"トンネルID".json
+
+ingress:
+
+hostname: "ドメイン名"
+service: http://localhost:8080
+
+service: http_status:404
+```
+
+- トンネルの起動
+ - cloudflared tunnel --config ~/.cloudflared/config.yaml run "トンネル名"
