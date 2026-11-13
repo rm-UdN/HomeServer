@@ -52,7 +52,6 @@ nextcloud_data:
 
 
 # cloudflare tunnelの導入
-
 - [nextcloud](https://github.com/cloudflare/cloudflared?tab=readme-ov-file)に従いインストール
   - wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
   - sudo apt install ./cloudflared-linux-amd64.deb
